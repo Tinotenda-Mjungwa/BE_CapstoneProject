@@ -12,6 +12,7 @@ from rest_framework.permissions import IsAdminUser
 from django.shortcuts import get_object_or_404
 
 
+
 class HealthCheck(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -76,29 +77,39 @@ class BookingDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return Booking.objects.filter(user=self.request.user)
 
+
 class ApproveBookingView(APIView):
     permission_classes = [IsAdminUser]
 
     def post(self, request, pk):
-        booking = get_object_or_404(Booking, pk=pk)
-        booking.status = "approved"
-        booking.save()
-
-        return Response(
-            {"message": "Booking approved"},
-            status=status.HTTP_200_OK
-        )
+        try:
+            booking = Booking.objects.get(pk=pk)
+            booking.is_approved = True
+            booking.save()
+            return Response(
+                {"message": "Booking approved"},
+                status=status.HTTP_200_OK
+            )
+        except Booking.DoesNotExist:
+            return Response(
+                {"error": "Booking not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
 
 class RejectBookingView(APIView):
     permission_classes = [IsAdminUser]
 
     def post(self, request, pk):
-        booking = get_object_or_404(Booking, pk=pk)
-        booking.status = "rejected"
-        booking.save()
-
-        return Response(
-            {"message": "Booking rejected"},
-            status=status.HTTP_200_OK
-        )
+        try:
+            booking = Booking.objects.get(pk=pk)
+            booking.delete()
+            return Response(
+                {"message": "Booking rejected and deleted"},
+                status=status.HTTP_200_OK
+            )
+        except Booking.DoesNotExist:
+            return Response(
+                {"error": "Booking not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
