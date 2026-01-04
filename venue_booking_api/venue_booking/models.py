@@ -1,24 +1,38 @@
 from django.db import models
+from django.conf import settings
+from django.utils import timezone
 
-# Create your models here.
+
 class Venue(models.Model):
     name = models.CharField(max_length=200)
-    bulding = models.CharField(max_length=200)
-    capacity = models.IntegerField(max_length=150)
+    building = models.CharField(max_length=200)
+    capacity = models.PositiveIntegerField()
     location = models.CharField(max_length=200)
-    amneties = models.CharField(max_length=200)
-    contact_phone = models.Varchar(max_length=50)
+    amenities = models.TextField(blank=True)
+    contact_phone = models.CharField(max_length=50)
 
     def __str__(self):
-        return self().name
+        return self.name
 
-class Booking(models.Models):
-    venue = models.ForeignKey(Venue, on_delete=models.CASCADE)
-    add_user = models.ForeignKey(add_user, on_delete=models.CASCADE)
+
+class Booking(models.Model):
+    venue = models.ForeignKey(
+        Venue,
+        on_delete=models.CASCADE,
+        related_name="bookings"
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="bookings"
+    )
     date = models.DateField()
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField()
-    status = models.BooleanField()
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    is_approved = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Booking for {self.venue}"
+        return f"{self.venue.name} booked by {self.user}"
+
+
