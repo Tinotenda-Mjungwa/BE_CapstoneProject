@@ -19,6 +19,8 @@ from django.http import JsonResponse
 from django.contrib import admin
 from django.urls import path,include
 from venue_booking  import views
+from venue_booking.views import RegisterView
+
 
 
 def api_root(request):
@@ -27,11 +29,16 @@ def api_root(request):
         "health": "/api/health/",
         "venues": "/api/venues/",
         "bookings": "/api/bookings/",
+        "register": "/api/register/",
     })
 
 urlpatterns = [
     path("", api_root),
     path("admin/", admin.site.urls),
     path("api/", include("venue_booking.urls")),
-     path('api/register/', RegisterView.as_view(), name='api-register'),
+    path('api/register/', RegisterView.as_view(), name='api-register'),
+    path("bookings/<int:pk>/approve/", views.ApproveBookingView.as_view(), name="booking-approve"),
+    path("bookings/<int:pk>/reject/", views.RejectBookingView.as_view(), name="booking-reject"),
+    path("login/", views.LoginAPIView.as_view(), name="api-login"),
+    path("logout/", views.LogoutAPIView.as_view(), name="api-logout"),
 ]
