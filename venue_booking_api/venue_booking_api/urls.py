@@ -18,6 +18,7 @@ Including another URLconf
 from django.http import JsonResponse
 from django.contrib import admin
 from django.urls import path,include
+from venue_booking  import views
 
 
 def api_root(request):
@@ -32,4 +33,5 @@ urlpatterns = [
     path("", api_root),
     path("admin/", admin.site.urls),
     path("api/", include("venue_booking.urls")),
+     path('api/register/', RegisterView.as_view(), name='api-register'),
 ]
