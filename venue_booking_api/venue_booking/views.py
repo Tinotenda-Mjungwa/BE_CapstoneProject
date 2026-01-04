@@ -8,8 +8,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import RegisterSerializer
-
-
+from rest_framework.permissions import IsAdminUser
+from django.shortcuts import get_object_or_404
 
 
 class HealthCheck(APIView):
@@ -84,3 +84,30 @@ class BookingDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return Booking.objects.filter(user=self.request.user)
+
+class ApproveBookingView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def post(self, request, pk):
+        booking = get_object_or_404(Booking, pk=pk)
+        booking.status = "approved"
+        booking.save()
+
+        return Response(
+            {"message": "Booking approved"},
+            status=status.HTTP_200_OK
+        )
+
+
+class RejectBookingView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def post(self, request, pk):
+        booking = get_object_or_404(Booking, pk=pk)
+        booking.status = "rejected"
+        booking.save()
+
+        return Response(
+            {"message": "Booking rejected"},
+            status=status.HTTP_200_OK
+        )
