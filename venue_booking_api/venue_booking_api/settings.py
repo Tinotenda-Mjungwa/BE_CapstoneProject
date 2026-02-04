@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
-import dj_database_url
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -79,15 +79,15 @@ WSGI_APPLICATION = 'venue_booking_api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-
+import dj_database_url
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
+        default=f"sqlite:///{BASE_DIR.as_posix()}/db.sqlite3",
+        conn_max_age=600,   # optional for production
+        ssl_require=False   # True for Postgres on Render
     )
 }
-
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
